@@ -18,20 +18,6 @@ __pycache__/
 *.pt
 *.pth
 
-# Experiment outputs
-experiments/
-runs/
 
-# Logs
-*.log
-*.txt
 
-# Jupyter
-.ipynb_checkpoints/
 
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDE files
-.idea/
