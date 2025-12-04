@@ -1,0 +1,37 @@
+# Virtual environments
+venv/
+.venv/
+myenv/
+env/
+*/__pycache__/
+__pycache__/
+
+# Python cache
+*.pyc
+*.pyo
+*.pyd
+
+# VSCode
+.vscode/
+
+# PyTorch model checkpoints
+*.pt
+*.pth
+
+# Experiment outputs
+experiments/
+runs/
+
+# Logs
+*.log
+*.txt
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.idea/

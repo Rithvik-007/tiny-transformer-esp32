@@ -1,0 +1,184 @@
+{
+    "data_checks": {
+      "tiny_transformer_dataset": {
+        "train_size": 3900,
+        "val_size": 836,
+        "test_size": 836,
+        "vocab_size": 2000,
+        "sample_input_shape": [40],
+        "sample_label_example": 0
+      },
+      "distilbert_dataset": {
+        "train_size": 3900,
+        "val_size": 836,
+        "test_size": 836,
+        "keys": ["input_ids", "attention_mask", "labels"],
+        "input_ids_shape": [64],
+        "sample_label_example": 0
+      }
+    },
+    "sanity_tests": {
+      "test_tiny_transformer_forward": {
+        "logits_shape": [1, 2],
+        "logits_example": [1.1758, -0.1979],
+        "warnings": [
+          "UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.num_heads is odd"
+        ]
+      }
+    },
+    "experiments": {
+      "tiny_transformer": {
+        "architecture": {
+          "d_model": 48,
+          "nhead": 3,
+          "num_layers": 2,
+          "dim_feedforward": 96,
+          "max_len": 40,
+          "num_classes": 2
+        },
+        "run1": {
+          "description": "Single-phase training from scratch (no explicit fine-tune phase).",
+          "device": "cuda",
+          "epochs": 8,
+          "epoch_logs": [
+            { "epoch": 1, "train_loss": 0.4756, "val_loss": 0.3587, "train_acc": 0.7921, "val_acc": 0.8660, "val_f1": 0.0000 },
+            { "epoch": 2, "train_loss": 0.3038, "val_loss": 0.2167, "train_acc": 0.8738, "val_acc": 0.9043, "val_f1": 0.4805 },
+            { "epoch": 3, "train_loss": 0.1605, "val_loss": 0.1526, "train_acc": 0.9415, "val_acc": 0.9438, "val_f1": 0.7814 },
+            { "epoch": 4, "train_loss": 0.1271, "val_loss": 0.1404, "train_acc": 0.9574, "val_acc": 0.9462, "val_f1": 0.8101 },
+            { "epoch": 5, "train_loss": 0.1111, "val_loss": 0.1237, "train_acc": 0.9633, "val_acc": 0.9593, "val_f1": 0.8482 },
+            { "epoch": 6, "train_loss": 0.1015, "val_loss": 0.1096, "train_acc": 0.9651, "val_acc": 0.9629, "val_f1": 0.8597 },
+            { "epoch": 7, "train_loss": 0.0885, "val_loss": 0.1096, "train_acc": 0.9705, "val_acc": 0.9665, "val_f1": 0.8772 },
+            { "epoch": 8, "train_loss": 0.0810, "val_loss": 0.0974, "train_acc": 0.9751, "val_acc": 0.9725, "val_f1": 0.8959 }
+          ],
+          "val_best_f1": 0.8959,
+          "test_metrics": {
+            "loss": 0.1147,
+            "accuracy": 0.9629,
+            "precision": 0.9010,
+            "recall": 0.8125,
+            "f1": 0.8545,
+            "confusion_matrix": [
+              [714, 10],
+              [21, 91]
+            ]
+          },
+          "checkpoint_path": "experiments/tiny_transformer/run1/checkpoint.pt"
+        },
+        "run2": {
+          "description": "Two-phase training: baseline + fine-tune with lower LR and weight decay. This is the main tiny model used for comparison and deployment.",
+          "device": "cuda",
+          "baseline_epochs": 5,
+          "finetune_epochs": 10,
+          "baseline_logs": [
+            { "epoch": 1, "train_loss": 0.3934, "val_loss": 0.3098, "train_acc": 0.8626, "val_acc": 0.8660, "val_f1": 0.0000 },
+            { "epoch": 2, "train_loss": 0.2555, "val_loss": 0.1936, "train_acc": 0.8877, "val_acc": 0.9222, "val_f1": 0.7059 },
+            { "epoch": 3, "train_loss": 0.1783, "val_loss": 0.1572, "train_acc": 0.9279, "val_acc": 0.9462, "val_f1": 0.7867 },
+            { "epoch": 4, "train_loss": 0.1458, "val_loss": 0.1456, "train_acc": 0.9495, "val_acc": 0.9522, "val_f1": 0.8291 },
+            { "epoch": 5, "train_loss": 0.1134, "val_loss": 0.1291, "train_acc": 0.9603, "val_acc": 0.9545, "val_f1": 0.8224 }
+          ],
+          "finetune_logs": [
+            { "epoch": 1, "train_loss": 0.1014, "val_loss": 0.1246, "train_acc": 0.9667, "val_acc": 0.9593, "val_f1": 0.8468 },
+            { "epoch": 2, "train_loss": 0.0949, "val_loss": 0.1227, "train_acc": 0.9672, "val_acc": 0.9629, "val_f1": 0.8610 },
+            { "epoch": 3, "train_loss": 0.0903, "val_loss": 0.1195, "train_acc": 0.9687, "val_acc": 0.9629, "val_f1": 0.8597 },
+            { "epoch": 4, "train_loss": 0.0905, "val_loss": 0.1160, "train_acc": 0.9705, "val_acc": 0.9617, "val_f1": 0.8545 },
+            { "epoch": 5, "train_loss": 0.0812, "val_loss": 0.1147, "train_acc": 0.9713, "val_acc": 0.9641, "val_f1": 0.8661 },
+            { "epoch": 6, "train_loss": 0.0842, "val_loss": 0.1117, "train_acc": 0.9749, "val_acc": 0.9641, "val_f1": 0.8661 },
+            { "epoch": 7, "train_loss": 0.0786, "val_loss": 0.1105, "train_acc": 0.9738, "val_acc": 0.9641, "val_f1": 0.8636 },
+            { "epoch": 8, "train_loss": 0.0788, "val_loss": 0.1111, "train_acc": 0.9738, "val_acc": 0.9641, "val_f1": 0.8673 },
+            { "epoch": 9, "train_loss": 0.0734, "val_loss": 0.1101, "train_acc": 0.9790, "val_acc": 0.9653, "val_f1": 0.8700 },
+            { "epoch": 10, "train_loss": 0.0677, "val_loss": 0.1079, "train_acc": 0.9774, "val_acc": 0.9629, "val_f1": 0.8597 }
+          ],
+          "val_best_f1": 0.8700,
+          "test_metrics_best_over_all": {
+            "loss": 0.1083,
+            "accuracy": 0.9665,
+            "precision": 0.9200,
+            "recall": 0.8214,
+            "f1": 0.8679,
+            "confusion_matrix": [
+              [716, 8],
+              [20, 92]
+            ]
+          },
+          "checkpoint_path": "experiments/tiny_transformer/run2/checkpoint.pt"
+        }
+      },
+      "distilbert": {
+        "run1": {
+          "description": "Pretrained DistilBERT used as a benchmark (baseline classifier training + fine-tuning last 2 layers).",
+          "device": "cuda",
+          "warnings": [
+            "Some weights of DistilBertForSequenceClassification were not initialized from the model checkpoint and are newly initialized (classifier and pre_classifier)."
+          ],
+          "baseline_epochs": 2,
+          "baseline_logs": [
+            { "epoch": 1, "train_loss": 0.1385, "val_loss": 0.0573, "train_acc": 0.9500, "val_acc": 0.9797, "val_f1": 0.9270 },
+            { "epoch": 2, "train_loss": 0.0486, "val_loss": 0.0290, "train_acc": 0.9851, "val_acc": 0.9868, "val_f1": 0.9511 }
+          ],
+          "finetune_epochs": 2,
+          "finetune_logs": [
+            { "epoch": 1, "train_loss": 0.0397, "val_loss": 0.0138, "train_acc": 0.9872, "val_acc": 0.9976, "val_f1": 0.9910 },
+            { "epoch": 2, "train_loss": 0.0240, "val_loss": 0.0152, "train_acc": 0.9926, "val_acc": 0.9928, "val_f1": 0.9735 }
+          ],
+          "test_metrics_finetuned": {
+            "loss": 0.0330,
+            "accuracy": 0.9844,
+            "precision": 0.9381,
+            "recall": 0.9464,
+            "f1": 0.9422,
+            "confusion_matrix": [
+              [717, 7],
+              [6, 106]
+            ]
+          },
+          "checkpoint_path": "experiments/distilbert/run1/checkpoint.pt"
+        }
+      }
+    },
+    "comparison": {
+      "tiny_run_used": 2,
+      "distilbert_run_used": 1,
+      "tiny_transformer": {
+        "accuracy": 0.9665,
+        "precision": 0.9200,
+        "recall": 0.8214,
+        "f1": 0.8679,
+        "confusion_matrix": [
+          [716, 8],
+          [20, 92]
+        ]
+      },
+      "distilbert": {
+        "accuracy": 0.9844,
+        "precision": 0.9381,
+        "recall": 0.9464,
+        "f1": 0.9422,
+        "confusion_matrix": [
+          [717, 7],
+          [6, 106]
+        ]
+      },
+      "notes": "DistilBERT outperforms the tiny Transformer on all metrics, but the tiny Transformer is much smaller and MCU-friendly."
+    },
+    "model_stats": {
+      "tiny_transformer": {
+        "vocab_size": 2000,
+        "total_parameters": 134018,
+        "trainable_parameters": 134018,
+        "memory_estimates_MB": {
+          "fp32": 0.511,
+          "int8": 0.128,
+          "int4": 0.064
+        },
+        "parameter_breakdown": {
+          "embed": 96000,
+          "encoder": 37920,
+          "fc": 98
+        },
+        "warnings": [
+          "UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.num_heads is odd"
+        ]
+      }
+    }
+  }
+  
